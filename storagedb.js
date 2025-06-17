@@ -6,7 +6,7 @@ class StorageDB {
         if (!store || typeof store !== 'string') {
             throw new TypeError(`${store} is not a non-empty string!`);
         }
-        if (Storage.#databases.has(database) {
+        if (StorageDB.#databases.has(database)) {
             throw new SyntaxError(`"${database}" has already been registered!`);
         }
         this.#database = database;
@@ -31,13 +31,19 @@ class StorageDB {
     open () {
         this.#db = new Promise((resolve, reject) => {
             let request = indexedDB.open(this.#database, 1);
-            request.onsuccess = () => resolve(request.result);
+            request.onsuccess = () => {
+                StorageDB.#databases.add(this.#database);
+                resolve(request.result);
+            }
             request.onupgradeneeded = (event) => request.result.createObjectStore(this.#store, { keyPath: 'key' });
             request.onerror = () => reject(request.error);
         });
     }
     close () {
-        return this.#db.then((db) => db.close());
+        return this.#db.then((db) => {
+            db.close();
+            StorageDB.#databases.delete(this.#database);
+        });
     }
     set (key, value) {
         return this.#transaction((store) => store.put({ key, value }));
