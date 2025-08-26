@@ -105,7 +105,7 @@ await storage.flush();
 
 ## Code Sample
 ```javascript
-let db = new Storage('sample', 'test');
+let db = new Storage('test');
 console.log(await db.set('aaa', 'bbb')); // 'aaa';
 console.log(await db.set('ccc', 'ddd')); // 'ccc';
 console.log(await db.has('bbb')); // false;
