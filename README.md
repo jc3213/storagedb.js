@@ -15,15 +15,12 @@
 
 ## Syntax
 ```javascript
-let storage = new StorageDB(dbName, storeName);
+let storage = new StorageDB(database);
 ```
-- dbName
+- database
     - `string`
     - The name of the database of `indexedDB`
     - You can't set database that has already been opened
-- storeName
-    - `string`
-    - The name of the object store in database of `indexedDB`
 
 ## Method
 - [set](#set)
