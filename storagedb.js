@@ -7,7 +7,6 @@ class StorageDB {
             throw new SyntaxError(`"${database}" has already been registered!`);
         }
         this.#database = database;
-        this.#store = store;
         this.open();
     }
     version = '0.3';
