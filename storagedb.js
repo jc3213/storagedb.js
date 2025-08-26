@@ -1,10 +1,7 @@
 class StorageDB {
-    constructor (database, store) {
+    constructor (database) {
         if (!database || typeof database !== 'string') {
             throw new TypeError(`${database} is not a non-empty string!`);
-        }
-        if (!store || typeof store !== 'string') {
-            throw new TypeError(`${store} is not a non-empty string!`);
         }
         if (StorageDB.#databases.has(database)) {
             throw new SyntaxError(`"${database}" has already been registered!`);
@@ -13,16 +10,15 @@ class StorageDB {
         this.#store = store;
         this.open();
     }
-    version = '0.2';
+    version = '0.3';
     static #databases = new Set();
     #database;
-    #store;
     #db;
     #transaction (callback) {
         return new Promise(async (resolve, reject) => {
             let db = await this.#db;
-            let transaction = db.transaction(this.#store, 'readwrite');
-            let store = transaction.objectStore(this.#store);
+            let transaction = db.transaction('storage', 'readwrite');
+            let store = transaction.objectStore('storage');
             let request = callback(store);
             request.onsuccess = () => resolve(request.result);
             request.onerror = () => reject(request.error);
@@ -35,7 +31,7 @@ class StorageDB {
                 StorageDB.#databases.add(this.#database);
                 resolve(request.result);
             }
-            request.onupgradeneeded = (event) => request.result.createObjectStore(this.#store, { keyPath: 'key' });
+            request.onupgradeneeded = (event) => request.result.createObjectStore('storage', { keyPath: 'key' });
             request.onerror = () => reject(request.error);
         });
     }
