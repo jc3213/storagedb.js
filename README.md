@@ -36,7 +36,7 @@ let storage = new StorageDB(database);
 
 ### set
 ```javascript
-storage.set(key, value);
+await storage.set(key, value);
 ```
 - key
     - `string` or `number`
