@@ -1,22 +1,21 @@
 class StorageDB {
     constructor (database) {
         if (!database || typeof database !== 'string') {
-            throw new TypeError(`${database} is not a non-empty string!`);
+            throw new TypeError('parameter 1 must be a non-empty string!');
         }
-        if (StorageDB.#databases.has(database)) {
-            throw new SyntaxError(`"${database}" has already been registered!`);
+        if (StorageDB.#instances.has(database)) {
+            throw new SyntaxError(`StorageDB "${database}" has already been opened!`);
         }
         this.#database = database;
-        this.open();
     }
-    version = '0.3';
-    static #databases = new Set();
+    version = '0.4';
+    static #instances = new Set();
+    #data = new Map();
     #database;
     #db;
     #transaction (callback) {
         return new Promise(async (resolve, reject) => {
-            let db = await this.#db;
-            let transaction = db.transaction('storage', 'readwrite');
+            let transaction = this.#db.transaction('storage', 'readwrite');
             let store = transaction.objectStore('storage');
             let request = callback(store);
             request.onsuccess = () => resolve(request.result);
@@ -24,48 +23,54 @@ class StorageDB {
         });
     }
     open () {
-        this.#db = new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             let request = indexedDB.open(this.#database, 1);
             request.onsuccess = () => {
-                StorageDB.#databases.add(this.#database);
-                resolve(request.result);
+                StorageDB.#instances.add(this.#database);
+                this.#db = request.result;
+                this.#transaction((store) => store.getAll()).then((storage) => {
+                    storage.forEach(({ key, value }) => this.#data.set(key, value));
+                    resolve(true);
+                });
             }
             request.onupgradeneeded = (event) => request.result.createObjectStore('storage', { keyPath: 'key' });
             request.onerror = () => reject(request.error);
         });
     }
     close () {
-        return this.#db.then((db) => {
-            db.close();
-            StorageDB.#databases.delete(this.#database);
+        return new Promise((resolve) => {
+            this.#db.close();
+            this.#data.clear();
+            StorageDB.#instances.delete(this.#database);
+            resolve(true);
         });
     }
     set (key, value) {
-        return this.#transaction((store) => store.put({ key, value }));
+        return this.#transaction((store) => store.put({ key, value })).then(() => this.#data.set(key, value));
     }
     has (key) {
-        return this.#transaction((store) => store.get(key)).then((item) => item !== undefined);
+        return this.#data.has(key);
     }
     get (key) {
-        return this.#transaction((store) => store.get(key)).then((item) => item?.value);
+        return this.#data.get(key);
     }
     delete (key) {
-        return this.#transaction((store) => store.delete(key));
+        return this.#transaction((store) => store.delete(key)).then(() => this.#data.delete(key));
     }
     entries () {
-        return this.#transaction((store) => store.getAll());
+        return [...this.#data];
     }
     keys () {
-        return this.#transaction((store) => store.getAllKeys());
+        return [...this.#data.keys()];
     }
     values () {
-        return this.entries().then((entries) => entries.map((item) => item.value));
+        return [...this.#data.values()];
     }
     forEach (callback) {
-        return this.entries().then((entries) => entries.forEach(callback));
+        this.#data.forEach((value, key) => callback({ key, value }));
     }
     clear () {
-        return this.#transaction((store) => store.clear());
+        return this.#transaction((store) => store.clear()).then(() => this.#data.clear());
     }
     flush () {
         return new Promise(async (resolve, reject) => {
