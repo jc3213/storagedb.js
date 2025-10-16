@@ -123,16 +123,15 @@ await storage.flush();
 ```javascript
 let db = new StorageDB('test');
 await db.open();
-console.log(await db.set('aaa', 'bbb')); // 'aaa';
-console.log(await db.set('ccc', 'ddd')); // 'ccc';
+console.log(await db.set('aaa', 'bbb')); // Map(1);
+console.log(await db.set('ccc', 'ddd')); // Map(2);
 console.log(db.has('bbb')); // false;
 console.log(db.keys()); // ['aaa', 'ccc'];
-console.log(db.set('aaa', 'eee')); // 'aaa'; overwrite 'aaa' => 'eee';
+console.log(await db.set('aaa', 'eee')); // Map(2); overwrite 'aaa' => 'eee';
 console.log(db.values()); // ['eee', 'ddd'];
-console.log(await db.delete('aaa')); // undefined; removed 'aaa' => 'eee';
-console.log(db.entries()); // [ {key: 'bbb', value: 'ddd'} ];
-console.log(await db.clear()); // undefined; clear all items under database 'sample' -> object store 'test'
-console.log(db.entries()); // [];
-console.log(await db.flush()); // true;
+console.log(await db.delete('aaa')); // Map(1); removed 'aaa' => 'eee';
+console.log(db.entries()); // ['ccc', 'ddd'];
+db.forEach(console.log); // {key: 'ccc', value: 'ddd'}
+console.log(await db.flush()); // undefined;
 console.log(await indexedDB.databases()); // [];
 ```
