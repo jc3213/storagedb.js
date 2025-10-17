@@ -3,13 +3,9 @@ class StorageDB {
         if (!database || typeof database !== 'string') {
             throw new TypeError('parameter 1 must be a non-empty string!');
         }
-        if (StorageDB.#instances.has(database)) {
-            throw new SyntaxError(`StorageDB "${database}" has already been opened!`);
-        }
         this.#database = database;
     }
-    version = '0.4';
-    static #instances = new Set();
+    version = '0.5';
     #data = new Map();
     #database;
     #db;
@@ -26,7 +22,6 @@ class StorageDB {
         return new Promise((resolve, reject) => {
             let request = indexedDB.open(this.#database, 1);
             request.onsuccess = () => {
-                StorageDB.#instances.add(this.#database);
                 this.#db = request.result;
                 this.#transaction((store) => store.getAll()).then((storage) => {
                     storage.forEach(({ key, value }) => this.#data.set(key, value));
@@ -41,7 +36,6 @@ class StorageDB {
         return new Promise((resolve) => {
             this.#db.close();
             this.#data.clear();
-            StorageDB.#instances.delete(this.#database);
             resolve(true);
         });
     }
