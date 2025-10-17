@@ -83,21 +83,21 @@ await storage.delete(key);
 let entries = storage.entires();
 ```
 - entries
-    - `array`
+    - `array` of **[ key, value ]**
 
 ### keys
 ```javascript
 let keys = storage.keys();
 ```
 - keys
-    - `array`
+    - `array` of **key**
 
 ### values
 ```javascript
 let values = storage.values();
 ```
 - values
-    - `array`
+    - `array` of **value**
 
 ### forEach
 ```javascript
