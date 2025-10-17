@@ -46,7 +46,7 @@ class StorageDB {
         });
     }
     set (key, value) {
-        return this.#transaction((store) => store.put({ key, value })).then(() => this.#data.set(key, value));
+        return this.#transaction((store) => store.put({ key, value })).then(() => this.#data.set(key, value) && { key, value });
     }
     has (key) {
         return this.#data.has(key);
@@ -55,7 +55,7 @@ class StorageDB {
         return this.#data.get(key);
     }
     delete (key) {
-        return this.#transaction((store) => store.delete(key)).then(() => this.#data.delete(key));
+        return this.#transaction((store) => store.delete(key)).then(() => !!this.#data.delete(key));
     }
     entries () {
         return [...this.#data];
@@ -70,7 +70,7 @@ class StorageDB {
         this.#data.forEach((value, key) => callback({ key, value }));
     }
     clear () {
-        return this.#transaction((store) => store.clear()).then(() => this.#data.clear());
+        return this.#transaction((store) => store.clear()).then(() => !!this.#data.clear());
     }
     flush () {
         return new Promise(async (resolve, reject) => {
