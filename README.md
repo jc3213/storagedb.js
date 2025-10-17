@@ -123,13 +123,13 @@ await storage.flush();
 ```javascript
 let db = new StorageDB('test');
 await db.open();
-console.log(await db.set('aaa', 'bbb')); // Map(1);
-console.log(await db.set('ccc', 'ddd')); // Map(2);
+console.log(await db.set('aaa', 'bbb')); // {key: 'aaa', value: 'bbb'};
+console.log(await db.set('ccc', 'ddd')); // {key: 'ccc', value: 'ddd'};
 console.log(db.has('bbb')); // false;
 console.log(db.keys()); // ['aaa', 'ccc'];
-console.log(await db.set('aaa', 'eee')); // Map(2); overwrite 'aaa' => 'eee';
+console.log(await db.set('aaa', 'eee')); // {key: 'aaa', value: 'eee'};
 console.log(db.values()); // ['eee', 'ddd'];
-console.log(await db.delete('aaa')); // Map(1); removed 'aaa' => 'eee';
+console.log(await db.delete('aaa')); // true;
 console.log(db.entries()); // ['ccc', 'ddd'];
 db.forEach(console.log); // {key: 'ccc', value: 'ddd'}
 console.log(await db.flush()); // undefined;
