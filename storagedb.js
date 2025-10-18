@@ -23,8 +23,8 @@ class StorageDB {
             let request = indexedDB.open(this.#database, 1);
             request.onsuccess = () => {
                 this.#db = request.result;
-                this.#transaction((store) => store.getAll()).then((storage) => {
-                    storage.forEach(({ key, value }) => this.#data.set(key, value));
+                this.#transaction((store) => store.getAll()).then((data) => {
+                    data.forEach(({ key, value }) => this.#data.set(key, value));
                     resolve(true);
                 });
             }
