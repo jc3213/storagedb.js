@@ -83,7 +83,7 @@ await storage.delete(key);
 let entries = storage.entires();
 ```
 - entries
-    - `array` of **[ key, value ]**
+    - `array` of **{ key, value }**
 
 ### keys
 ```javascript
@@ -123,15 +123,15 @@ await storage.flush();
 ```javascript
 let db = new StorageDB('test');
 await db.open();
-console.log(await db.set('aaa', 'bbb')); // {key: 'aaa', value: 'bbb'};
-console.log(await db.set('ccc', 'ddd')); // {key: 'ccc', value: 'ddd'};
+console.log(await db.set('aaa', 'bbb')); // { key: 'aaa', value: 'bbb' };
+console.log(await db.set('ccc', 'ddd')); // { key: 'ccc', value: 'ddd' };
 console.log(db.has('bbb')); // false;
 console.log(db.keys()); // ['aaa', 'ccc'];
-console.log(await db.set('aaa', 'eee')); // {key: 'aaa', value: 'eee'};
-console.log(db.values()); // ['eee', 'ddd'];
+console.log(await db.set('aaa', 'eee')); // { key: 'aaa', value: 'eee' };
+console.log(db.entries()); // [ { key: 'aaa', value: 'eee' }, { key: 'ccc', value: 'ddd' } ];
 console.log(await db.delete('aaa')); // true;
-console.log(db.entries()); // ['ccc', 'ddd'];
-db.forEach(console.log); // {key: 'ccc', value: 'ddd'}
+console.log(db.values()); // ['ddd'];
+db.forEach(console.log); // { key: 'ccc', value: 'ddd'}
 console.log(await db.flush()); // undefined;
 console.log(await indexedDB.databases()); // [];
 ```
