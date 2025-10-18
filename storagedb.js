@@ -52,7 +52,7 @@ class StorageDB {
         return this.#transaction((store) => store.delete(key)).then(() => !!this.#data.delete(key));
     }
     entries () {
-        return [...this.#data];
+        return [...this.#data].map(([key, value]) => ({ key, value }));
     }
     keys () {
         return [...this.#data.keys()];
