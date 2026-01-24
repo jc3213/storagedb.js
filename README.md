@@ -39,7 +39,7 @@ let storage = new StorageDB(database);
 - [forEach](#foreach)
 - [clear](#clear)
     - Async: Promise
-- [flush](#flush)
+- [destroy](#destroy)
     - Async: Promise
 
 ### open
@@ -114,9 +114,9 @@ storage.forEach(
 await storage.clear();
 ```
 
-### flush
+### destroy
 ```javascript
-await storage.flush();
+await storage.destroy();
 ```
 
 ## Code Sample
@@ -132,6 +132,6 @@ console.log(db.entries()); // [ { key: 'aaa', value: 'eee' }, { key: 'ccc', valu
 console.log(await db.delete('aaa')); // true;
 console.log(db.values()); // ['ddd'];
 db.forEach(console.log); // { key: 'ccc', value: 'ddd'}
-console.log(await db.flush()); // undefined;
+console.log(await db.destroy()); // undefined;
 console.log(await indexedDB.databases()); // [];
 ```
