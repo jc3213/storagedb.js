@@ -15,12 +15,8 @@
 
 ## Syntax
 ```javascript
-let storage = new StorageDB(database);
+let storage = new StorageDB();
 ```
-- database
-    - `string`
-    - The name of the database of `indexedDB`
-    - You can't set database that has already been opened
 
 ## Method
 - [open](#open)
