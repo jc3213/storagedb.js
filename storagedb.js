@@ -1,6 +1,6 @@
 class StorageDB {
     static #ready = false;
-    #data = new Map();
+    #storage = new Map();
     #db;
 
     constructor() {
@@ -32,60 +32,62 @@ class StorageDB {
         db.onversionchange = () => db.close();
         await Promise.resolve();
         this.#db = db;
-        let data = await this.#transaction((store) => store.getAll());
-        for (let { key, value } of data) {
-            this.#data.set(key, value);
+        let entries = await this.#transaction((store) => store.getAll());
+        let storage = this.#storage;
+        for (let i = 0, l = entries.length; i < l; i++) {
+            let entry = entries[i];
+            storage.set(entry.key, entry.value);
         }
         return true;
     }
 
     async close() {
         this.#db.close();
-        this.#data.clear();
+        this.#storage = new Map();
         return true;
     }
 
     has(key) {
-        return this.#data.has(key);
+        return this.#storage.has(key);
     }
 
     async set(key, value) {
         await this.#transaction(store => store.put({ key, value }));
-        this.#data.set(key, value);
+        this.#storage.set(key, value);
         return { key, value };
     }
 
     get(key) {
-        return this.#data.get(key);
+        return this.#storage.get(key);
     }
 
     async delete(key) {
         await this.#transaction((store) => store.delete(key));
-        this.#data.delete(key);
+        this.#storage.delete(key);
         return true;
     }
 
     entries() {
-        return Object.fromEntries(this.#data);
+        return Array.from(this.#storage);
     }
 
     keys() {
-        return [...this.#data.keys()];
+        return Array.from(this.#storage.keys());
     }
 
     values() {
-        return [...this.#data.values()];
+        return Array.from(this.#storage.values());
     }
 
     forEach(callback) {
-        for (let [key, value] of this.#data) {
-            callback({ key, value });
+        for (let entry of this.#storage) {
+            callback(entry);
         }
     }
 
     async clear() {
         await this.#transaction((store) => store.clear());
-        this.#data = new Map();
+        this.#storage = new Map();
         return true;
     }
 
